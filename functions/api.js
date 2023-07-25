@@ -1,14 +1,16 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
+const serverless = require('serverless-http');
 const token = '6014535737:AAGvhmuhBWrWQ9Z4ttPfOrKPxg7zvFEOsbE';
 const webAppUrl = 'https://master--bucolic-bienenstitch-18b937.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
 const app = express();
+const router = express.Router();
 
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -27,10 +29,26 @@ bot.on('message', async (msg) => {
       }
     );
   }
+  if (msg?.web_app_data?.data) {
+    try {
+      const data = JSON.parse(msg?.web_app_data?.data);
+      console.log(data);
+      await bot.sendMessage(chatId, 'Спасибо за обратную связь!');
+      await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
+      await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
+
+      setTimeout(async () => {
+        await bot.sendMessage(chatId, 'Всю информацию вы получите в этом чате');
+      }, 3000);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 });
 
-app.post('/web-data', async (req, res) => {
+app.post('/content', async (req, res) => {
   const { hours, minutes, id } = req.body;
+  console.log(hours, minutes, id);
   try {
     await bot.answerWebAppQuery(id, {
       type: 'article',
@@ -55,4 +73,6 @@ app.post('/web-data', async (req, res) => {
 });
 const PORT = 8000;
 
-app.listen(PORT, () => console.log('server started on PORT ' + PORT));
+// app.listen(PORT, () => console.log('server started on PORT ' + PORT));
+app.use('/.netlify/functions/api', router);
+module.exports.handler = serverless(app);

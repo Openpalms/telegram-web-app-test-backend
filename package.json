@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "netlify deploy --prod"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "node-telegram-bot-api": "^0.61.0"
+    "netlify-cli": "^15.9.1",
+    "netlify-lambda": "^2.0.16",
+    "node-telegram-bot-api": "^0.61.0",
+    "serverless-http": "^3.2.0"
   }
 }
